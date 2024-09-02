@@ -1,5 +1,6 @@
 <script setup>
   import { ref, reactive, onMounted } from 'vue'
+  import Alerta from './components/Alerta.vue'
 
   const API_URL = 'https://min-api.cryptocompare.com/data/top/mktcapfull?limit=20&tsym=USD'
 
@@ -11,6 +12,7 @@
   ])
 
   const criptomonedas = ref([])
+  const error = ref('')
 
   const formulario = reactive({
     moneda: '',
@@ -25,7 +27,10 @@
 
   const obtenerCotizacion = () => {
     if (Object.values(formulario).includes('')) {
-      console.log('Selecciona una moneda y una criptomoneda')
+      error.value = 'Selecciona una moneda y una criptomoneda'
+      setTimeout(() => {
+        error.value = ''
+      }, 2000)
       return
     }
     console.log('Consultando API...', formulario.moneda, formulario.criptomoneda)
@@ -37,6 +42,10 @@
   <div class="contenedor">
     <h1 class="titulo">Cotizador de <span>Criptomonedas</span></h1>
     <div class="contenido">
+      <Alerta
+          v-if="error !== ''">
+        {{ error }}
+      </Alerta>
       <form
           @submit.prevent="obtenerCotizacion"
           class="formulario">
