@@ -1,40 +1,19 @@
 <script setup>
-  import { ref, reactive, onMounted } from 'vue'
+  import useCripto from './composables/useCripto.js'
   import Alerta from './components/Alerta.vue'
+  import Spinner from './components/Spinner.vue'
+  import Cotizacion from './components/Cotizacion.vue'
 
-  const API_URL = 'https://min-api.cryptocompare.com/data/top/mktcapfull?limit=20&tsym=USD'
-
-  const monedas = ref([
-    { codigo: 'USD', texto: 'Dolar de Estados Unidos'},
-    { codigo: 'MXN', texto: 'Peso Mexicano'},
-    { codigo: 'EUR', texto: 'Euro'},
-    { codigo: 'GBP', texto: 'Libra Esterlina'},
-  ])
-
-  const criptomonedas = ref([])
-  const error = ref('')
-
-  const formulario = reactive({
-    moneda: '',
-    criptomoneda: ''
-  })
-
-  onMounted(() => {
-    fetch(API_URL)
-        .then((respuesta => respuesta.json()))
-        .then(({Data}) => criptomonedas.value = Data)
-  })
-
-  const obtenerCotizacion = () => {
-    if (Object.values(formulario).includes('')) {
-      error.value = 'Selecciona una moneda y una criptomoneda'
-      setTimeout(() => {
-        error.value = ''
-      }, 2000)
-      return
-    }
-    console.log('Consultando API...', formulario.moneda, formulario.criptomoneda)
-  }
+  const {
+    monedas,
+    formulario,
+    error,
+    criptomonedas,
+    cargandoCotizacion,
+    obtenerCotizacion,
+    cotizacion,
+    mostrarResultados
+  } = useCripto()
 
 </script>
 
@@ -80,6 +59,10 @@
             type="submit"
             value="Cotizar">
       </form>
+      <Spinner v-if="cargandoCotizacion" />
+      <Cotizacion
+          v-if="mostrarResultados"
+          :cotizacion="cotizacion"/>
     </div>
   </div>
 </template>
